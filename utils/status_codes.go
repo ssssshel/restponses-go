@@ -11,10 +11,11 @@ const (
 	Status202Accepted                    = 202
 	Status203NonAuthoritativeInformation = 203
 	Status204NoContent                   = 204
+	Status205ResetContent                = 205
 	Status206PartialContent              = 206
 	Status207MultiStatus                 = 207
 	Status208AlreadyReported             = 208
-	Status226ImUsed                      = 226
+	Status226IMUsed                      = 226
 
 	Status300MultipleChoices   = 300
 	Status301MovedPermanently  = 301
