@@ -23,19 +23,19 @@ type Status2xx_Response struct {
 
 // Response for 201 status code
 type Status201Created_Response struct {
-	Status2xx_Response        // The classic response that you love
+	Status2xx_Response        // The classic response that you love ❤️
 	Location           string `json:"location"` // URL or place where your creation can be found
 }
 
 // Response for 202 status code
 type Status202Accepted_Response struct {
-	Status2xx_Response        // The classic response that you love
+	Status2xx_Response        // The classic response that you love ❤️
 	RequestId          string `json:"request_id"` // ID with wich you can follow the process of your request
 }
 
 // Response for 203 status code
 type Status203NonAI_Response struct {
-	Status2xx_Response // The classic response that you love
+	Status2xx_Response // The classic response that you love ❤️
 
 	// Here you can put info about the third source involved
 	Source struct {
@@ -47,7 +47,7 @@ type Status203NonAI_Response struct {
 
 // Response for 207 status code
 type Status207MultiStatus_Response struct {
-	Status2xx_Response                // The classic response that you love
+	Status2xx_Response                // The classic response that you love ❤️
 	States             []BaseResponse `json:"states"` // Here you can put info about the multiple states (Status, server_message and resource)
 }
 
@@ -102,15 +102,15 @@ type Status308PermanentRedirect_Response struct {
 	RedirectUrl string `json:"redirect_url"` // Permanent redirect URL that should be queried with tha same HTTP method
 }
 
-// Default response for 4xx status code. Specific response for 400 Bad request, 401 Unauthorized, 402 Payment required and 403 Forbidden state codes
+// Default response for 4xx status code. Specific response for 400 Bad request, 401 Unauthorized, 402 Payment required, 403 Forbidden and 412 Precondition failed state codes
 type GenericErrorResponse struct {
 	BaseResponse
 	Errors []interface{} `json:"errorMessage"`
 }
 
 type Status404NotFound_Response struct {
-	GenericErrorResponse
-	NotFoundResource string // Name of not found resource
+	GenericErrorResponse        // The classic response that you hate 👺
+	NotFoundResource     string // Name of not found resource
 }
 
 type Status405MethodNotAllowed_Response struct {
@@ -126,7 +126,7 @@ type Status406NotAcceptable_Response struct {
 type Status407ProxyAuthenticationRequired_Response struct {
 	GenericErrorResponse
 	AuthenticationType string // Auth type
-	Realm              string // Domain to which auth is requested
+	Realm              string // Domain to which auth was requested
 }
 
 type Status408RequestTimeout_Response struct {
@@ -149,4 +149,14 @@ type Status410Gone_Response struct {
 type Status411LengthRequired_Response struct {
 	GenericErrorResponse
 	RequiredHeaders string // Content-Length header
+}
+
+type Status413PayloadTooLarge_Response struct {
+	GenericErrorResponse
+	MaxAllowedSize string // Max allowed payload size
+}
+
+type Status414RequestUriTooLong_Response struct {
+	GenericErrorResponse
+	MaxAllowedLength uint // Max allowed URI length
 }
