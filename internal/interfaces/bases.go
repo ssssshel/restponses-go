@@ -102,61 +102,161 @@ type Status308PermanentRedirect_Response struct {
 	RedirectUrl string `json:"redirect_url"` // Permanent redirect URL that should be queried with tha same HTTP method
 }
 
-// Default response for 4xx status code. Specific response for 400 Bad request, 401 Unauthorized, 402 Payment required, 403 Forbidden and 412 Precondition failed state codes
+// Default response for 4xx and 5xx status code.
+/*
+Specific response for 400 Bad request, 401 Unauthorized, 402 Payment required, 403 Forbidden, 412 Precondition failed, 417 Expectation failed, 421 Misdirected request, 422 Unprocessable entity, 425 Unassigned, 426 Upgrade required, 428 Precondition required, 429 Too many requests, 431 Request header fields too large and 451 Unavailable for legal reasons state codes*/
 type GenericErrorResponse struct {
 	BaseResponse
-	Errors []interface{} `json:"errorMessage"`
+	Errors []ErrorDetail `json:"errors"` // List of errors
+	SuccessErrorProps
 }
 
+type ErrorDetail struct {
+	Name        string `json:"name"`           // Error name e.g., "Resource api/potato not found"
+	Code        string `json:"code,omitempty"` // Error code e.g., "ERR_NOT_FOUND"
+	Description string `json:"description"`    // Error description
+}
+
+// Response for 404 status code
 type Status404NotFound_Response struct {
-	GenericErrorResponse        // The classic response that you hate 👺
-	NotFoundResource     string // Name of not found resource
+	BaseResponse
+	Errors []struct {
+		ErrorDetail
+		NotFoundResource string `json:"not_found_resource"` // Name of not found resource
+	}
+	SuccessErrorProps
 }
 
+// Response for 405 status code
 type Status405MethodNotAllowed_Response struct {
-	GenericErrorResponse
-	AllowedMethods []string // List of allowed method
+	BaseResponse
+	Errors []struct {
+		ErrorDetail
+		AllowedMethods []string `json:"allowed_methods"` // List of allowed method
+	}
+	SuccessErrorProps
 }
 
+// Response for 406 status code
 type Status406NotAcceptable_Response struct {
-	GenericErrorResponse
-	AllowedRepresentations []string // List of allowed representations
+	BaseResponse
+	Errors []struct {
+		ErrorDetail
+		AllowedRepresentations []string `json:"allowed_representations"` // List of allowed representations
+	}
+	SuccessErrorProps
 }
 
+// Response for 407 status code
 type Status407ProxyAuthenticationRequired_Response struct {
-	GenericErrorResponse
-	AuthenticationType string // Auth type
-	Realm              string // Domain to which auth was requested
+	BaseResponse
+	Errors []struct {
+		ErrorDetail
+		AuthenticationType string `json:"authentication_type"` // Auth type
+		Realm              string `json:"realm"`               // Domain to which auth was requested
+	}
+	SuccessErrorProps
 }
 
+// Response for 408 status code
 type Status408RequestTimeout_Response struct {
-	GenericErrorResponse
-	TimeWaiting string // Time waiting
+	BaseResponse
+	Errors []struct {
+		ErrorDetail
+		TimeWaiting string `json:"time_waiting"` // Time waiting
+	}
+	SuccessErrorProps
 }
 
+// Response for 409 status code
 type Status409Conflict_Response struct {
-	GenericErrorResponse
-	ConflictResource string // Conflicting resource name
-	ConflictId       string // Personalized conflict ID
+	BaseResponse
+	Errors []struct {
+		ErrorDetail
+		ConflictResource string `json:"conflict_resource"` // Conflicting resource name
+		ConflictId       string `json:"conflict_id"`       // Personalized conflict ID
+	}
+	SuccessErrorProps
 }
 
+// Response for 410 status code
 type Status410Gone_Response struct {
-	GenericErrorResponse
-	GoneResource string // Gone resource name
-	Reason       string // Reason why the resource is gone
+	BaseResponse
+	Errors []struct {
+		ErrorDetail
+		GoneResource string `json:"gone_resource"` // Gone resource name
+		Reason       string `json:"reason"`        // Reason why the resource is gone
+	}
+	SuccessErrorProps
 }
 
+// Response for 411 status code
 type Status411LengthRequired_Response struct {
-	GenericErrorResponse
-	RequiredHeaders string // Content-Length header
+	BaseResponse
+	Errors []struct {
+		ErrorDetail
+		RequiredHeader string `json:"required_header"` // Content-Length header
+	}
+	SuccessErrorProps
 }
 
+// Response for 413 status code
 type Status413PayloadTooLarge_Response struct {
-	GenericErrorResponse
-	MaxAllowedSize string // Max allowed payload size
+	BaseResponse
+	Errors []struct {
+		ErrorDetail
+		MaxAllowedSize string `json:"max_allowed_size"` // Max allowed payload size
+	}
+	SuccessErrorProps
 }
 
+// Response for 414 status code
 type Status414RequestUriTooLong_Response struct {
-	GenericErrorResponse
-	MaxAllowedLength uint // Max allowed URI length
+	BaseResponse
+	Errors []struct {
+		ErrorDetail
+		MaxAllowedLength uint `json:"max_allowed_length"` // Max allowed URI length | e.g.,
+	}
+	SuccessErrorProps
+}
+
+// Response for 415 status code
+type Status415UnsupportedMediaType_Response struct {
+	BaseResponse
+	Errors []struct {
+		ErrorDetail
+		SupportedMediaTypes []string `json:"supported_media_types"` // List of supported media types
+	}
+	SuccessErrorProps
+}
+
+// Response for 416 status code
+type Status416RequestRangeNotSatisfiable_Response struct {
+	BaseResponse
+	Errors []struct {
+		ErrorDetail
+		RequestedContentRange string `json:"requested_content_range"` // Range requested by client
+		SupportedContentRange string `json:"supported_content_range"` // Range supported by server
+	}
+	SuccessErrorProps
+}
+
+// Response for 423 status code
+type Status423Locked_Response struct {
+	BaseResponse
+	Errors []struct {
+		ErrorDetail
+		LockedResource string `json:"locked_resource"` // Locked resource name/URL
+	}
+	SuccessErrorProps
+}
+
+// Response for 424 status code
+type Status424FailedDependency struct {
+	BaseResponse
+	Errors []struct {
+		ErrorDetail
+		FailedDependency string `json:"failed_dependency"` // Failed dependency name
+	}
+	SuccessErrorProps
 }
