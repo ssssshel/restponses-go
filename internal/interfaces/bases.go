@@ -71,6 +71,16 @@ type Status301MovedPermanently_Response struct {
 	}
 }
 
+type Status302Found_Response struct {
+	Status3xx_Response
+	RedirectUrl string
+}
+
+type Status303SeeOther_Response struct {
+	Status3xx_Response
+	RedirectUrl string //URL to which the GET request should be made
+}
+
 type GenericErrorResponse struct {
 	BaseResponse
 	ErrorMessage string `json:"errorMessage"`
