@@ -149,3 +149,32 @@ type GenericErrorResponse struct {
 	Errors []interface{} `json:"errors"` // List []*ErrorDetail or representation of errors
 	*SuccessErrorProps
 }
+
+type ErrorsDetails struct {
+	// GENERIC | Default specs for 4xx and 5xx
+
+	Name        string `json:"name,omitempty"`        // Error name | e.g., "Resource api/potato not found"
+	Code        string `json:"code,omitempty"`        // Error code | e.g., "ERR_NOT_FOUND"
+	Description string `json:"description,omitempty"` // Error description | e.g., "The requested resource could not be found"
+
+	// 400s
+
+	NotFoundResource       string   `json:"notFoundResource,omitempty"`       // 404 ONLY | Name of not found resource | e.g., "api/potato/user"
+	AllowedMethods         []string `json:"allowedMethods,omitempty"`         // 405 ONLY | List of allowed method | e.g., ["GET", "PUT"]
+	AllowedRepresentations []string `json:"allowedRepresentations,omitempty"` // 406 ONLY | List of allowed representations | e.g., ["image/png", "application/json"]
+	AuthenticationType     string   `json:"authenticationType,omitempty"`     // 407 ONLY | Auth type | e.g., "Bearer"
+	Realm                  string   `json:"realm,omitempty"`                  // 407 ONLY | Domain to which auth was requested | e.g., "proxy.potato.com"
+	TimeWaiting            string   `json:"timeWaiting,omitempty"`            // 408 ONLY | Time waiting | e.g., "30s"
+	ConflictResource       string   `json:"conflictResource,omitempty"`       // 409 ONLY | Conflicting resource name | e.g., "Potato user"
+	ConflictId             string   `json:"conflictId,omitempty"`             // 409 ONLY | Personalized conflict ID | e.g., "POT_USER_ERR_H345"
+	GoneResource           string   `json:"goneResource,omitempty"`           // 410 ONLY | Gone resource name | e.g., "Potato user"
+	Reason                 string   `json:"reason,omitempty"`                 // 410 ONLY | Reason why the resource is gone | e.g., "Deleted"
+	RequiredHeader         string   `json:"requiredHeader,omitempty"`         // 411 ONLY | Content-Length header: "Content-Lenght"
+	MaxAllowedSize         string   `json:"maxAllowedSize,omitempty"`         // 413 ONLY | Max allowed payload size | e.g., "10MB"
+	MaxAllowedLength       uint     `json:"maxAllowedLength,omitempty"`       // 414 ONLY | Max allowed URI length | e.g., 3500
+	SupportedMediaTypes    []string `json:"supportedMediaTypes,omitempty"`    // 415 ONLY | List of supported media types | e.g., ["image/jpg", "audio/*"]
+	RequestedContentRange  string   `json:"requestedContentRange,omitempty"`  // 416 ONLY | Range requested by client | e.g., */500
+	SupportedContentRange  string   `json:"supportedContentRange,omitempty"`  // 416 ONLY | Range supported by server | e.g., */100
+	LockedResource         string   `json:"lockedResource,omitempty"`         // 423 ONLY | Locked resource name/URL
+	FailedDependency       string   `json:"failedDependency,omitempty"`       // 424 ONLY | Failed dependency name
+}

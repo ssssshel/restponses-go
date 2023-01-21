@@ -95,13 +95,11 @@ func Status305Opt(proxyUrl string) methods.Response3xxOpt {
 func Status307Opt(redirectUrl string) methods.Response3xxOpt {
 	return func(r *interfaces.GenericRedirectionResponse) {
 		r.RedirectUrl = redirectUrl
-
 	}
 }
 
 func Status308Opt(redirectUrl string) methods.Response3xxOpt {
 	return func(r *interfaces.GenericRedirectionResponse) {
 		r.RedirectUrl = redirectUrl
-
 	}
 }

@@ -121,153 +121,84 @@ func Response3xxRedirection(statusCode StatusCode3xx, serverMessage, details, co
 	return res
 }
 
-func Response300MultipleChoices(serverMessage, details, consultedResource string, options []interface{}) *interfaces.Status300MultipleChoices_Response {
+// 400s 500s
 
-	defaultContent := states.DefaultStatesContent[states.Status300MultipleChoices]
+func Response4xxClientError(statusCode StatusCode4xx, serverMessage, details, consultedResource string) *interfaces.GenericErrorResponse {
+	var defaultContent states.HttpStatus
 
-	res := &interfaces.Status300MultipleChoices_Response{
-		Status3xx_Response: &interfaces.Status3xx_Response{
-			BaseResponse: &interfaces.BaseResponse{
-				HttpStatus:        defaultContent.Code,
-				ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-				Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-				ConsultedResource: consultedResource,
-			},
-		},
-		Options: options,
+	switch statusCode {
+	case Status400:
+		defaultContent = states.DefaultStatesContent[states.Status400BadRequest]
+	case Status401:
+		defaultContent = states.DefaultStatesContent[states.Status401Unauthorized]
+	case Status402:
+		defaultContent = states.DefaultStatesContent[states.Status402PaymentRequired]
+	case Status403:
+		defaultContent = states.DefaultStatesContent[states.Status403Forbidden]
+	case Status404:
+		defaultContent = states.DefaultStatesContent[states.Status404NotFound]
+	case Status405:
+		defaultContent = states.DefaultStatesContent[states.Status405MethodNotAllowed]
+	case Status406:
+		defaultContent = states.DefaultStatesContent[states.Status406NotAcceptable]
+	case Status407:
+		defaultContent = states.DefaultStatesContent[states.Status407ProxyAuthenticationRequired]
+	case Status408:
+		defaultContent = states.DefaultStatesContent[states.Status408RequestTimeout]
+	case Status409:
+		defaultContent = states.DefaultStatesContent[states.Status409Conflict]
+	case Status410:
+		defaultContent = states.DefaultStatesContent[states.Status410Gone]
+	case Status411:
+		defaultContent = states.DefaultStatesContent[states.Status411LengthRequired]
+	case Status412:
+		defaultContent = states.DefaultStatesContent[states.Status412PreconditionFailed]
+	case Status413:
+		defaultContent = states.DefaultStatesContent[states.Status413PayloadTooLarge]
+	case Status414:
+		defaultContent = states.DefaultStatesContent[states.Status414RequestUriTooLong]
+	case Status415:
+		defaultContent = states.DefaultStatesContent[states.Status415UnsupportedMediaType]
+	case Status416:
+		defaultContent = states.DefaultStatesContent[states.Status416RequestRangeNotSatisfiable]
+	case Status417:
+		defaultContent = states.DefaultStatesContent[states.Status417ExpectationFailed]
+	case Status418:
+		defaultContent = states.DefaultStatesContent[states.Status418Teapot]
+	case Status421:
+		defaultContent = states.DefaultStatesContent[states.Status421MisdirectedRequest]
+	case Status422:
+		defaultContent = states.DefaultStatesContent[states.Status422UnprocessableEntity]
+	case Status423:
+		defaultContent = states.DefaultStatesContent[states.Status423Locked]
+	case Status424:
+		defaultContent = states.DefaultStatesContent[states.Status424FailedDependency]
+	case Status425:
+		defaultContent = states.DefaultStatesContent[states.Status425Unassigned]
+	case Status426:
+		defaultContent = states.DefaultStatesContent[states.Status426UpgradeRequired]
+	case Status428:
+		defaultContent = states.DefaultStatesContent[states.Status428PreconditionRequired]
+	case Status429:
+		defaultContent = states.DefaultStatesContent[states.Status429TooManyRequests]
+	case Status431:
+		defaultContent = states.DefaultStatesContent[states.Status431RequestHeaderFieldsTooLarge]
+	case Status451:
+		defaultContent = states.DefaultStatesContent[states.Status451UnavailableForLegalReasons]
 	}
 
-	return res
-}
-
-func Response301MovedPermanently(serverMessage, details, consultedResource, oldSource, newSource string) *interfaces.Status301MovedPermanently_Response {
-
-	defaultContent := states.DefaultStatesContent[states.Status301MovedPermanently]
-
-	res := &interfaces.Status301MovedPermanently_Response{
-		Status3xx_Response: &interfaces.Status3xx_Response{
-			BaseResponse: &interfaces.BaseResponse{
-				HttpStatus:        defaultContent.Code,
-				ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-				Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-				ConsultedResource: consultedResource,
-			},
-		},
-		Sources: &interfaces.Sources{
-			OldSouce:  oldSource,
-			NewSource: newSource,
-		},
-	}
-
-	return res
-}
-
-func Response302Found(serverMessage, details, consultedResource, redirectUrl string) *interfaces.Status302Found_Response {
-
-	defaultContent := states.DefaultStatesContent[states.Status302Found]
-
-	res := &interfaces.Status302Found_Response{
-		Status3xx_Response: &interfaces.Status3xx_Response{
-			BaseResponse: &interfaces.BaseResponse{
-				HttpStatus:        defaultContent.Code,
-				ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-				Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-				ConsultedResource: consultedResource,
-			},
-		},
-		RedirectUrl: redirectUrl,
-	}
-
-	return res
-}
-
-func Response303SeeOther(serverMessage, details, consultedResource, redirectUrl string) *interfaces.Status303SeeOther_Response {
-
-	defaultContent := states.DefaultStatesContent[states.Status303SeeOther]
-
-	res := &interfaces.Status303SeeOther_Response{
-		Status3xx_Response: &interfaces.Status3xx_Response{
-			BaseResponse: &interfaces.BaseResponse{
-				HttpStatus:        defaultContent.Code,
-				ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-				Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-				ConsultedResource: consultedResource,
-			},
-		},
-		RedirectUrl: redirectUrl,
-	}
-
-	return res
-}
-
-func Response304NotModified(serverMessage, details, consultedResource string) *interfaces.Status3xx_Response {
-
-	defaultContent := states.DefaultStatesContent[states.Status304NotModified]
-
-	res := &interfaces.Status3xx_Response{
+	res := &interfaces.GenericErrorResponse{
 		BaseResponse: &interfaces.BaseResponse{
 			HttpStatus:        defaultContent.Code,
 			ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
 			Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
 			ConsultedResource: consultedResource,
 		},
-	}
 
-	return res
-}
-
-func Response305UseProxy(serverMessage, details, consultedResource, proxyUrl string) *interfaces.Status305UseProxy_Response {
-
-	defaultContent := states.DefaultStatesContent[states.Status305UseProxy]
-
-	res := &interfaces.Status305UseProxy_Response{
-		Status3xx_Response: &interfaces.Status3xx_Response{
-			BaseResponse: &interfaces.BaseResponse{
-				HttpStatus:        defaultContent.Code,
-				ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-				Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-				ConsultedResource: consultedResource,
-			},
+		SuccessErrorProps: &interfaces.SuccessErrorProps{
+			Success: false,
+			Error:   true,
 		},
-		ProxyUrl: proxyUrl,
-	}
-
-	return res
-}
-
-func Response307TemporaryRedirect(serverMessage, details, consultedResource, redirectUrl string) *interfaces.Status307TemporaryRedirect_Response {
-
-	defaultContent := states.DefaultStatesContent[states.Status307TemporaryRedirect]
-
-	res := &interfaces.Status307TemporaryRedirect_Response{
-		Status3xx_Response: &interfaces.Status3xx_Response{
-			BaseResponse: &interfaces.BaseResponse{
-				HttpStatus:        defaultContent.Code,
-				ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-				Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-				ConsultedResource: consultedResource,
-			},
-		},
-		RedirectUrl: redirectUrl,
-	}
-
-	return res
-}
-
-func Response308PermanentRedirect(serverMessage, details, consultedResource, redirectUrl string) *interfaces.Status308PermanentRedirect_Response {
-
-	defaultContent := states.DefaultStatesContent[states.Status308PermanentRedirect]
-
-	res := &interfaces.Status308PermanentRedirect_Response{
-		Status3xx_Response: &interfaces.Status3xx_Response{
-			BaseResponse: &interfaces.BaseResponse{
-				HttpStatus:        defaultContent.Code,
-				ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-				Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-				ConsultedResource: consultedResource,
-			},
-		},
-		RedirectUrl: redirectUrl,
 	}
 
 	return res
