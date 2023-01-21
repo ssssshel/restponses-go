@@ -80,6 +80,8 @@ type GeneralInput struct {
 	}
 }
 
+// 100s
+
 // Base of all responses. Also default response for 1xx state codes
 type BaseResponse struct {
 	HttpStatus        states.StatusCode `json:"status"`
@@ -88,33 +90,18 @@ type BaseResponse struct {
 	ConsultedResource string            `json:"consultedResource,omitempty"` // Name/URL of the consulted resource
 }
 
-/*
-# Default response for 2xx status code.
- - Specific response for: 200 Ok | 204 No Content | 205 Reset Content | 206 Partial Content | 208 Already Reported | 226 IM Used
-*/
-type Status2xx_Response struct {
+// 200s
+
+type GenericSuccessfullResponse struct {
 	*BaseResponse
 	Data interface{} `json:"data"` // Anything you want to return, don't use for 204 and 205 codes
+
+	Location  string         `json:"location,omitempty"`  // 201 ONLY | URL or place where your creation can be found
+	RequestId string         `json:"requestId,omitempty"` // 202 ONLY | ID with wich you can follow the process of your request
+	Source    *Source        `json:"source,omitempty"`    // 203 ONLY | Here you can put info about the third source involved
+	States    []*BasicStatus `json:"states,omitempty"`    // 207 ONLY | Here you can put info about the multiple states (Status, server_message and resource)
+
 	*SuccessErrorProps
-}
-
-// Response for 201 status code
-type Status201Created_Response struct {
-	*Status2xx_Response        // The classic response that you love ❤️
-	Location            string `json:"location,omitempty"` // URL or place where your creation can be found
-}
-
-// Response for 202 status code
-type Status202Accepted_Response struct {
-	*Status2xx_Response        // The classic response that you love ❤️
-	RequestId           string `json:"requestId,omitempty"` // ID with wich you can follow the process of your request
-}
-
-// Response for 203 status code
-type Status203NonAI_Response struct {
-	*Status2xx_Response // The classic response that you love ❤️
-	// Here you can put info about the third source involved
-	Source *Source `json:"source,omitempty"`
 }
 
 type Source struct {
@@ -123,31 +110,28 @@ type Source struct {
 	Source      string `json:"source,omitempty"`      // Source url
 }
 
-// Response for 207 status code
-type Status207MultiStatus_Response struct {
-	*Status2xx_Response                 // The classic response that you love ❤️
-	States              []*BaseResponse `json:"states,omitempty"` // Here you can put info about the multiple states (Status, server_message and resource)
+type BasicStatus struct {
+	HttpStatus    states.StatusCode `json:"status"`
+	ServerMessage string            `json:"serverMessage"`
+	Details       string            `json:"details,omitempty"`
 }
 
-/*
-# Default response for 3xx status code.
- - Specific response for: 304 Not modified
-*/
-type Status3xx_Response struct {
+// 300s
+
+type GenericRedirectionResponse struct {
 	*BaseResponse
-	// SuccessErrorProps
-}
 
-// Response for 300 status code
-type Status300MultipleChoices_Response struct {
-	*Status3xx_Response
-	Options []interface{} `json:"options,omitempty"` // Here you can put the options available for the requested resource
-}
-
-// Response for 301 status code
-type Status301MovedPermanently_Response struct {
-	*Status3xx_Response
-	Sources *Sources `json:"sources,omitempty"`
+	Options []interface{} `json:"options,omitempty"` // 300 ONLY | Here you can put the options available for the requested resource
+	Sources *Sources      `json:"sources,omitempty"` // 301 ONLY
+	/*
+		Redirect for multiple states:
+		 - 302 => Temporary redirect URL
+		 - 303 => URL to which the GET request should be made
+		 - 307 => Temporary redirect URL that should be queried with the same HTTP method
+		 - 308 => Permanent redirect URL that should be queried with tha same HTTP method
+	*/
+	RedirectUrl string `json:"redirectUrl,omitempty"`
+	ProxyUrl    string `json:"proxyUrl,omitempty"` // 305 ONLY | Proxy URL to redirect
 }
 
 type Sources struct {
@@ -155,35 +139,7 @@ type Sources struct {
 	NewSource string `json:"newSource,omitempty"` // New URL or resource
 }
 
-// Response for 302 status code
-type Status302Found_Response struct {
-	*Status3xx_Response
-	RedirectUrl string `json:"redirectUrl,omitempty"` // Temporary redirect URL
-}
-
-// Response for 303 status code
-type Status303SeeOther_Response struct {
-	*Status3xx_Response
-	RedirectUrl string `json:"redirectUrl"` // URL to which the GET request should be made
-}
-
-// Response for 305 status code
-type Status305UseProxy_Response struct {
-	*Status3xx_Response
-	ProxyUrl string `json:"proxyUrl"` // Proxy URL to redirect
-}
-
-// Response for 307 status code
-type Status307TemporaryRedirect_Response struct {
-	*Status3xx_Response
-	RedirectUrl string `json:"redirectUrl"` // Temporary redirect URL that should be queried with the same HTTP method
-}
-
-// Response for 308 status code
-type Status308PermanentRedirect_Response struct {
-	*Status3xx_Response
-	RedirectUrl string `json:"redirectUrl"` // Permanent redirect URL that should be queried with tha same HTTP method
-}
+// 400s 500s
 
 /*
 # Default response for 4xx and 5xx status code.

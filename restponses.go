@@ -6,86 +6,21 @@ import (
 	"github.com/ssssshel/restponses-go/internal/states"
 )
 
-type method int
-
-const (
-	Get method = iota
-	Post
-	Delete
-	Put
-)
-
 // 100s
 
-/*
-You can use these functions as parameters:
-  - WMessage() => Allows to add "serverMessage" field in your response
-  - WDetails() => Allows to add "details" field in your response
-  - WResourceName() => Allows to add "consultedResource" field in your response
-*/
-func Response100Continue(serverMessage, details, consultedResource string) *interfaces.BaseResponse {
+func Response1xxInformative(statusCode StatusCode1xx, serverMessage, details, consultedResource string) *interfaces.BaseResponse {
+	var defaultContent states.HttpStatus
 
-	defaultContent := states.DefaultStatesContent[states.Status100Continue]
-
-	res := &interfaces.BaseResponse{
-		HttpStatus:        defaultContent.Code,
-		ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-		Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-		ConsultedResource: consultedResource,
+	switch statusCode {
+	case Status100:
+		defaultContent = states.DefaultStatesContent[states.Status100Continue]
+	case Status101:
+		defaultContent = states.DefaultStatesContent[states.Status101SwitchingProtocols]
+	case Status102:
+		defaultContent = states.DefaultStatesContent[states.Status102Processing]
+	case Status103:
+		defaultContent = states.DefaultStatesContent[states.Status103Checkpoint]
 	}
-
-	return res
-}
-
-/*
-You can use these functions as parameters:
-  - WMessage() => Allows to add "serverMessage" field in your response
-  - WDetails() => Allows to add "details" field in your response
-  - WResourceName() => Allows to add "consultedResource" field in your response
-*/
-func Response101SwitchingProtocols(serverMessage, details, consultedResource string) *interfaces.BaseResponse {
-
-	defaultContent := states.DefaultStatesContent[states.Status101SwitchingProtocols]
-
-	res := &interfaces.BaseResponse{
-		HttpStatus:        defaultContent.Code,
-		ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-		Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-		ConsultedResource: consultedResource,
-	}
-
-	return res
-}
-
-/*
-You can use these functions as parameters:
-  - WMessage() => Allows to add "serverMessage" field in your response
-  - WDetails() => Allows to add "details" field in your response
-  - WResourceName() => Allows to add "consultedResource" field in your response
-*/
-func Response102Processing(serverMessage, details, consultedResource string) *interfaces.BaseResponse {
-
-	defaultContent := states.DefaultStatesContent[states.Status102Processing]
-
-	res := &interfaces.BaseResponse{
-		HttpStatus:        defaultContent.Code,
-		ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-		Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-		ConsultedResource: consultedResource,
-	}
-
-	return res
-}
-
-/*
-You can use these functions as parameters:
-  - WMessage() => Allows to add "serverMessage" field in your response
-  - WDetails() => Allows to add "details" field in your response
-  - WResourceName() => Allows to add "consultedResource" field in your response
-*/
-func Response103Checkpoint(serverMessage, details, consultedResource string) *interfaces.BaseResponse {
-
-	defaultContent := states.DefaultStatesContent[states.Status103Checkpoint]
 
 	res := &interfaces.BaseResponse{
 		HttpStatus:        defaultContent.Code,
@@ -99,233 +34,89 @@ func Response103Checkpoint(serverMessage, details, consultedResource string) *in
 
 // 200s
 
-/*
-You can use these functions as parameters:
-  - WMessage() => Allows to add "serverMessage" field in your response
-  - WDetails() => Allows to add "details" field in your response
-  - WResourceName() => Allows to add "consultedResource" field in your response
-*/
-func Response200Ok(serverMessage, details, consultedResource string, data interface{}) *interfaces.Status2xx_Response {
+func Response2xxSuccessfull(statusCode StatusCode2xx, serverMessage, details, consultedResource string, data interface{}, statusOptions methods.Response2xxOpt) *interfaces.GenericSuccessfullResponse {
+	var defaultContent states.HttpStatus
 
-	defaultContent := states.DefaultStatesContent[states.Status200Ok]
+	switch statusCode {
+	case Status200:
+		defaultContent = states.DefaultStatesContent[states.Status200Ok]
+	case Status201:
+		defaultContent = states.DefaultStatesContent[states.Status201Created]
+	case Status202:
+		defaultContent = states.DefaultStatesContent[states.Status202Accepted]
+	case Status203:
+		defaultContent = states.DefaultStatesContent[states.Status203NonAuthoritativeInformation]
+	case Status204:
+		defaultContent = states.DefaultStatesContent[states.Status204NoContent]
+	case Status205:
+		defaultContent = states.DefaultStatesContent[states.Status205ResetContent]
+	case Status206:
+		defaultContent = states.DefaultStatesContent[states.Status206PartialContent]
+	case Status207:
+		defaultContent = states.DefaultStatesContent[states.Status207MultiStatus]
+	case Status208:
+		defaultContent = states.DefaultStatesContent[states.Status208AlreadyReported]
+	case Status226:
+		defaultContent = states.DefaultStatesContent[states.Status226IMUsed]
+	}
 
-	res := &interfaces.Status2xx_Response{
+	res := &interfaces.GenericSuccessfullResponse{
 		BaseResponse: &interfaces.BaseResponse{
 			HttpStatus:        defaultContent.Code,
 			ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
 			Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
 			ConsultedResource: consultedResource,
 		},
-		Data: data,
+
 		SuccessErrorProps: &interfaces.SuccessErrorProps{
 			Success: true,
 			Error:   false,
 		},
 	}
 
+	// for _, opt := range statusOptions {
+	// 	opt(res)
+	// }
+
+	statusOptions(res)
+
 	return res
 }
 
-func Response201Created(serverMessage, details, consultedResource string, data interface{}, location string) *interfaces.Status201Created_Response {
+// 300s
 
-	defaultContent := states.DefaultStatesContent[states.Status201Created]
+func Response3xxRedirection(statusCode StatusCode3xx, serverMessage, details, consultedResource string, statusOptions methods.Response3xxOpt) *interfaces.GenericRedirectionResponse {
+	var defaultContent states.HttpStatus
 
-	res := &interfaces.Status201Created_Response{
-		Status2xx_Response: &interfaces.Status2xx_Response{
-			BaseResponse: &interfaces.BaseResponse{
-				HttpStatus:        defaultContent.Code,
-				ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-				Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-				ConsultedResource: consultedResource,
-			},
-			Data: data,
-			SuccessErrorProps: &interfaces.SuccessErrorProps{
-				Success: true,
-				Error:   false,
-			},
-		},
-		Location: location,
+	switch statusCode {
+	case Status300:
+		defaultContent = states.DefaultStatesContent[states.Status300MultipleChoices]
+	case Status301:
+		defaultContent = states.DefaultStatesContent[states.Status301MovedPermanently]
+	case Status302:
+		defaultContent = states.DefaultStatesContent[states.Status302Found]
+	case Status303:
+		defaultContent = states.DefaultStatesContent[states.Status303SeeOther]
+	case Status304:
+		defaultContent = states.DefaultStatesContent[states.Status304NotModified]
+	case Status305:
+		defaultContent = states.DefaultStatesContent[states.Status305UseProxy]
+	case Status307:
+		defaultContent = states.DefaultStatesContent[states.Status307TemporaryRedirect]
+	case Status308:
+		defaultContent = states.DefaultStatesContent[states.Status308PermanentRedirect]
 	}
 
-	return res
-}
-
-func Response202Accepted(serverMessage, details, consultedResource string, data interface{}, requestId string) *interfaces.Status202Accepted_Response {
-
-	defaultContent := states.DefaultStatesContent[states.Status202Accepted]
-
-	res := &interfaces.Status202Accepted_Response{
-		Status2xx_Response: &interfaces.Status2xx_Response{
-			BaseResponse: &interfaces.BaseResponse{
-				HttpStatus:        defaultContent.Code,
-				ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-				Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-				ConsultedResource: consultedResource,
-			},
-			Data: data,
-			SuccessErrorProps: &interfaces.SuccessErrorProps{
-				Success: true,
-				Error:   false,
-			},
-		},
-		RequestId: requestId,
-	}
-
-	return res
-}
-
-func Response203NonAuthoritativeInformation(serverMessage, details, consultedResource string, data interface{}, sourceName, sourceDescription, sourceUrl string) *interfaces.Status203NonAI_Response {
-
-	defaultContent := states.DefaultStatesContent[states.Status203NonAuthoritativeInformation]
-
-	res := &interfaces.Status203NonAI_Response{
-		Status2xx_Response: &interfaces.Status2xx_Response{
-			BaseResponse: &interfaces.BaseResponse{
-				HttpStatus:        defaultContent.Code,
-				ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-				Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-				ConsultedResource: consultedResource,
-			},
-			Data: data,
-			SuccessErrorProps: &interfaces.SuccessErrorProps{
-				Success: true,
-				Error:   false,
-			},
-		},
-		Source: &interfaces.Source{
-			Name:        sourceName,
-			Description: sourceDescription,
-			Source:      sourceUrl,
-		},
-	}
-
-	return res
-}
-
-func Response204NoContent(serverMessage, details, consultedResource string) *interfaces.Status2xx_Response {
-
-	defaultContent := states.DefaultStatesContent[states.Status204NoContent]
-
-	res := &interfaces.Status2xx_Response{
+	res := &interfaces.GenericRedirectionResponse{
 		BaseResponse: &interfaces.BaseResponse{
 			HttpStatus:        defaultContent.Code,
 			ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
 			Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
 			ConsultedResource: consultedResource,
 		},
-		SuccessErrorProps: &interfaces.SuccessErrorProps{
-			Success: true,
-			Error:   false,
-		},
 	}
 
-	return res
-}
-
-func Response205ResetContent(serverMessage, details, consultedResource string, data interface{}) *interfaces.Status2xx_Response {
-
-	defaultContent := states.DefaultStatesContent[states.Status205ResetContent]
-
-	res := &interfaces.Status2xx_Response{
-		BaseResponse: &interfaces.BaseResponse{
-			HttpStatus:        defaultContent.Code,
-			ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-			Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-			ConsultedResource: consultedResource,
-		},
-		Data: data,
-		SuccessErrorProps: &interfaces.SuccessErrorProps{
-			Success: true,
-			Error:   false,
-		},
-	}
-
-	return res
-}
-
-func Response206PartialContent(serverMessage, details, consultedResource string, data interface{}) *interfaces.Status2xx_Response {
-
-	defaultContent := states.DefaultStatesContent[states.Status206PartialContent]
-
-	res := &interfaces.Status2xx_Response{
-		BaseResponse: &interfaces.BaseResponse{
-			HttpStatus:        defaultContent.Code,
-			ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-			Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-			ConsultedResource: consultedResource,
-		},
-		Data: data,
-		SuccessErrorProps: &interfaces.SuccessErrorProps{
-			Success: true,
-			Error:   false,
-		},
-	}
-
-	return res
-}
-
-func Response207MultiStatus(serverMessage, details, consultedResource string, data interface{}, multipleStates []*interfaces.BaseResponse) *interfaces.Status207MultiStatus_Response {
-
-	defaultContent := states.DefaultStatesContent[states.Status207MultiStatus]
-
-	res := &interfaces.Status207MultiStatus_Response{
-		Status2xx_Response: &interfaces.Status2xx_Response{
-			BaseResponse: &interfaces.BaseResponse{
-				HttpStatus:        defaultContent.Code,
-				ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-				Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-				ConsultedResource: consultedResource,
-			},
-			Data: data,
-			SuccessErrorProps: &interfaces.SuccessErrorProps{
-				Success: true,
-				Error:   false,
-			},
-		},
-		States: multipleStates,
-	}
-
-	return res
-}
-
-func Response208AlreadyReported(serverMessage, details, consultedResource string, data interface{}) *interfaces.Status2xx_Response {
-
-	defaultContent := states.DefaultStatesContent[states.Status208AlreadyReported]
-
-	res := &interfaces.Status2xx_Response{
-		BaseResponse: &interfaces.BaseResponse{
-			HttpStatus:        defaultContent.Code,
-			ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-			Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-			ConsultedResource: consultedResource,
-		},
-		Data: data,
-		SuccessErrorProps: &interfaces.SuccessErrorProps{
-			Success: true,
-			Error:   false,
-		},
-	}
-
-	return res
-}
-
-func Response226IMUsed(serverMessage, details, consultedResource string, data interface{}) *interfaces.Status2xx_Response {
-
-	defaultContent := states.DefaultStatesContent[states.Status226IMUsed]
-
-	res := &interfaces.Status2xx_Response{
-		BaseResponse: &interfaces.BaseResponse{
-			HttpStatus:        defaultContent.Code,
-			ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-			Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-			ConsultedResource: consultedResource,
-		},
-		Data: data,
-		SuccessErrorProps: &interfaces.SuccessErrorProps{
-			Success: true,
-			Error:   false,
-		},
-	}
+	statusOptions(res)
 
 	return res
 }
