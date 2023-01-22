@@ -318,3 +318,178 @@ func Response226IMUsed(serverMessage, details, consultedResource string, data in
 
 	return res
 }
+
+func Response300MultipleChoices(serverMessage, details, consultedResource string, options []interface{}) *interfaces.Status300MultipleChoices_Response {
+
+	defaultContent := states.DefaultStatesContent[states.Status300MultipleChoices]
+
+	res := &interfaces.Status300MultipleChoices_Response{
+		Status3xx_Response: &interfaces.Status3xx_Response{
+			BaseResponse: &interfaces.BaseResponse{
+				HttpStatus:        defaultContent.Code,
+				ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
+				Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
+				ConsultedResource: consultedResource,
+			},
+		},
+		Options: options,
+	}
+
+	return res
+}
+
+func Response301MovedPermanently(serverMessage, details, consultedResource, oldSource, newSource string) *interfaces.Status301MovedPermanently_Response {
+
+	defaultContent := states.DefaultStatesContent[states.Status301MovedPermanently]
+
+	res := &interfaces.Status301MovedPermanently_Response{
+		Status3xx_Response: &interfaces.Status3xx_Response{
+			BaseResponse: &interfaces.BaseResponse{
+				HttpStatus:        defaultContent.Code,
+				ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
+				Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
+				ConsultedResource: consultedResource,
+			},
+		},
+		Sources: &interfaces.Sources{
+			OldSouce:  oldSource,
+			NewSource: newSource,
+		},
+	}
+
+	return res
+}
+
+func Response302Found(serverMessage, details, consultedResource, redirectUrl string) *interfaces.Status302Found_Response {
+
+	defaultContent := states.DefaultStatesContent[states.Status302Found]
+
+	res := &interfaces.Status302Found_Response{
+		Status3xx_Response: &interfaces.Status3xx_Response{
+			BaseResponse: &interfaces.BaseResponse{
+				HttpStatus:        defaultContent.Code,
+				ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
+				Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
+				ConsultedResource: consultedResource,
+			},
+		},
+		RedirectUrl: redirectUrl,
+	}
+
+	return res
+}
+
+func Response303SeeOther(serverMessage, details, consultedResource, redirectUrl string) *interfaces.Status303SeeOther_Response {
+
+	defaultContent := states.DefaultStatesContent[states.Status303SeeOther]
+
+	res := &interfaces.Status303SeeOther_Response{
+		Status3xx_Response: &interfaces.Status3xx_Response{
+			BaseResponse: &interfaces.BaseResponse{
+				HttpStatus:        defaultContent.Code,
+				ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
+				Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
+				ConsultedResource: consultedResource,
+			},
+		},
+		RedirectUrl: redirectUrl,
+	}
+
+	return res
+}
+
+func Response304NotModified(serverMessage, details, consultedResource string) *interfaces.Status3xx_Response {
+
+	defaultContent := states.DefaultStatesContent[states.Status304NotModified]
+
+	res := &interfaces.Status3xx_Response{
+		BaseResponse: &interfaces.BaseResponse{
+			HttpStatus:        defaultContent.Code,
+			ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
+			Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
+			ConsultedResource: consultedResource,
+		},
+	}
+
+	return res
+}
+
+func Response305UseProxy(serverMessage, details, consultedResource, proxyUrl string) *interfaces.Status305UseProxy_Response {
+
+	defaultContent := states.DefaultStatesContent[states.Status305UseProxy]
+
+	res := &interfaces.Status305UseProxy_Response{
+		Status3xx_Response: &interfaces.Status3xx_Response{
+			BaseResponse: &interfaces.BaseResponse{
+				HttpStatus:        defaultContent.Code,
+				ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
+				Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
+				ConsultedResource: consultedResource,
+			},
+		},
+		ProxyUrl: proxyUrl,
+	}
+
+	return res
+}
+
+func Response307TemporaryRedirect(serverMessage, details, consultedResource, redirectUrl string) *interfaces.Status307TemporaryRedirect_Response {
+
+	defaultContent := states.DefaultStatesContent[states.Status307TemporaryRedirect]
+
+	res := &interfaces.Status307TemporaryRedirect_Response{
+		Status3xx_Response: &interfaces.Status3xx_Response{
+			BaseResponse: &interfaces.BaseResponse{
+				HttpStatus:        defaultContent.Code,
+				ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
+				Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
+				ConsultedResource: consultedResource,
+			},
+		},
+		RedirectUrl: redirectUrl,
+	}
+
+	return res
+}
+
+func Response308PermanentRedirect(serverMessage, details, consultedResource, redirectUrl string) *interfaces.Status308PermanentRedirect_Response {
+
+	defaultContent := states.DefaultStatesContent[states.Status308PermanentRedirect]
+
+	res := &interfaces.Status308PermanentRedirect_Response{
+		Status3xx_Response: &interfaces.Status3xx_Response{
+			BaseResponse: &interfaces.BaseResponse{
+				HttpStatus:        defaultContent.Code,
+				ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
+				Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
+				ConsultedResource: consultedResource,
+			},
+		},
+		RedirectUrl: redirectUrl,
+	}
+
+	return res
+}
+
+// 400s
+
+func Response400BadRequest(serverMessage, details, consultedResource string, errors []interface{}) *interfaces.GenericErrorResponse {
+
+	defaultContent := states.DefaultStatesContent[states.Status400BadRequest]
+
+	res := &interfaces.GenericErrorResponse{
+		BaseResponse: &interfaces.BaseResponse{
+			HttpStatus:        defaultContent.Code,
+			ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
+			Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
+			ConsultedResource: consultedResource,
+		},
+		Errors: errors,
+		SuccessErrorProps: &interfaces.SuccessErrorProps{
+			Success: false,
+			Error:   true,
+		},
+	}
+
+	return res
+}

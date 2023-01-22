@@ -121,9 +121,9 @@ func Response3xxRedirection(statusCode StatusCode3xx, serverMessage, details, co
 	return res
 }
 
-// 400s 500s
+// 400s
 
-func Response4xxClientError(statusCode StatusCode4xx, serverMessage, details, consultedResource string) *interfaces.GenericErrorResponse {
+func Response4xxClientError(statusCode StatusCode4xx, serverMessage, details, consultedResource string, arbitraryErrors interface{}, statusOptions methods.ResponseErrorOpt) *interfaces.GenericErrorResponse {
 	var defaultContent states.HttpStatus
 
 	switch statusCode {
@@ -195,18 +195,52 @@ func Response4xxClientError(statusCode StatusCode4xx, serverMessage, details, co
 			ConsultedResource: consultedResource,
 		},
 
+		Errors: arbitraryErrors,
+
 		SuccessErrorProps: &interfaces.SuccessErrorProps{
 			Success: false,
 			Error:   true,
 		},
 	}
 
+	statusOptions(res)
+
 	return res
 }
 
-func Response400BadRequest(serverMessage, details, consultedResource string, errors []interface{}) *interfaces.GenericErrorResponse {
+// 500s
 
-	defaultContent := states.DefaultStatesContent[states.Status400BadRequest]
+func Response5xxServerError(statusCode StatusCode5xx, serverMessage, details, consultedResource string, arbitraryErrors interface{}) *interfaces.GenericErrorResponse {
+	var defaultContent states.HttpStatus
+
+	switch statusCode {
+	case Status500:
+		defaultContent = states.DefaultStatesContent[states.Status500InternalServerError]
+	case Status501:
+		defaultContent = states.DefaultStatesContent[states.Status501NotImplemented]
+	case Status502:
+		defaultContent = states.DefaultStatesContent[states.Status502BadGateway]
+	case Status503:
+		defaultContent = states.DefaultStatesContent[states.Status503ServiceUnavailable]
+	case Status504:
+		defaultContent = states.DefaultStatesContent[states.Status504GatewayTimeout]
+	case Status505:
+		defaultContent = states.DefaultStatesContent[states.Status505HTTPVersionNotSupported]
+	case Status506:
+		defaultContent = states.DefaultStatesContent[states.Status506VariantAlsoNegotiates]
+	case Status507:
+		defaultContent = states.DefaultStatesContent[states.Status507InsufficientStorage]
+	case Status508:
+		defaultContent = states.DefaultStatesContent[states.Status508LoopDetected]
+	case Status509:
+		defaultContent = states.DefaultStatesContent[states.Status509BandwidthLimitExceeded]
+	case Status510:
+		defaultContent = states.DefaultStatesContent[states.Status510NotExtended]
+	case Status511:
+		defaultContent = states.DefaultStatesContent[states.Status511NetworkAuthenticationRequired]
+	case Status521:
+		defaultContent = states.DefaultStatesContent[states.Status521WebServerIsDown]
+	}
 
 	res := &interfaces.GenericErrorResponse{
 		BaseResponse: &interfaces.BaseResponse{
@@ -215,7 +249,9 @@ func Response400BadRequest(serverMessage, details, consultedResource string, err
 			Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
 			ConsultedResource: consultedResource,
 		},
-		Errors: errors,
+
+		Errors: arbitraryErrors,
+
 		SuccessErrorProps: &interfaces.SuccessErrorProps{
 			Success: false,
 			Error:   true,

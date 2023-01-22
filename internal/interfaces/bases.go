@@ -146,11 +146,12 @@ type Sources struct {
 */
 type GenericErrorResponse struct {
 	*BaseResponse
-	Errors []interface{} `json:"errors"` // List []*ErrorDetail or representation of errors
+	ErrorDetails *ErrorDetails
+	Errors       interface{} `json:"errors,omitempty"` // List []*ErrorDetail or representation of errors
 	*SuccessErrorProps
 }
 
-type ErrorsDetails struct {
+type ErrorDetails struct {
 	// GENERIC | Default specs for 4xx and 5xx
 
 	Name        string `json:"name,omitempty"`        // Error name | e.g., "Resource api/potato not found"
@@ -169,7 +170,7 @@ type ErrorsDetails struct {
 	ConflictId             string   `json:"conflictId,omitempty"`             // 409 ONLY | Personalized conflict ID | e.g., "POT_USER_ERR_H345"
 	GoneResource           string   `json:"goneResource,omitempty"`           // 410 ONLY | Gone resource name | e.g., "Potato user"
 	Reason                 string   `json:"reason,omitempty"`                 // 410 ONLY | Reason why the resource is gone | e.g., "Deleted"
-	RequiredHeader         string   `json:"requiredHeader,omitempty"`         // 411 ONLY | Content-Length header: "Content-Lenght"
+	RequiredHeader         string   `json:"requiredHeader,omitempty"`         // 411 ONLY | Content-Length header: "Content-Length"
 	MaxAllowedSize         string   `json:"maxAllowedSize,omitempty"`         // 413 ONLY | Max allowed payload size | e.g., "10MB"
 	MaxAllowedLength       uint     `json:"maxAllowedLength,omitempty"`       // 414 ONLY | Max allowed URI length | e.g., 3500
 	SupportedMediaTypes    []string `json:"supportedMediaTypes,omitempty"`    // 415 ONLY | List of supported media types | e.g., ["image/jpg", "audio/*"]
