@@ -20,6 +20,8 @@ func Response1xxInformative(statusCode StatusCode1xx, serverMessage, details, co
 		defaultContent = states.DefaultStatesContent[states.Status102Processing]
 	case Status103:
 		defaultContent = states.DefaultStatesContent[states.Status103Checkpoint]
+	default:
+		return nil
 	}
 
 	res := &interfaces.BaseResponse{
@@ -58,6 +60,8 @@ func Response2xxSuccessfull(statusCode StatusCode2xx, serverMessage, details, co
 		defaultContent = states.DefaultStatesContent[states.Status208AlreadyReported]
 	case Status226:
 		defaultContent = states.DefaultStatesContent[states.Status226IMUsed]
+	default:
+		return nil
 	}
 
 	res := &interfaces.GenericSuccessfullResponse{
@@ -67,18 +71,16 @@ func Response2xxSuccessfull(statusCode StatusCode2xx, serverMessage, details, co
 			Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
 			ConsultedResource: consultedResource,
 		},
-
+		Data: data,
 		SuccessErrorProps: &interfaces.SuccessErrorProps{
 			Success: true,
 			Error:   false,
 		},
 	}
 
-	// for _, opt := range statusOptions {
-	// 	opt(res)
-	// }
-
-	statusOptions(res)
+	if statusOptions != nil {
+		statusOptions(res)
+	}
 
 	return res
 }
@@ -116,7 +118,9 @@ func Response3xxRedirection(statusCode StatusCode3xx, serverMessage, details, co
 		},
 	}
 
-	statusOptions(res)
+	if statusOptions != nil {
+		statusOptions(res)
+	}
 
 	return res
 }
@@ -203,7 +207,9 @@ func Response4xxClientError(statusCode StatusCode4xx, serverMessage, details, co
 		},
 	}
 
-	statusOptions(res)
+	if statusOptions != nil {
+		statusOptions(res)
+	}
 
 	return res
 }
