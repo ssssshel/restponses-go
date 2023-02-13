@@ -74,17 +74,17 @@ type Sources struct {
 */
 type GenericErrorResponse struct {
 	*BaseResponse
-	ErrorDetails *ErrorDetails
-	Errors       interface{} `json:"errors,omitempty"` // List []*ErrorDetail or representation of errors
+	ErrorDetails *ErrorDetails `json:"errorDetails,omitempty"` // Error details
+	Errors       interface{}   `json:"errors,omitempty"`       // List []*ErrorDetail or representation of errors
 	*SuccessErrorProps
 }
 
 type ErrorDetails struct {
 	// GENERIC | Default specs for 4xx and 5xx
 
-	Name        string `json:"name,omitempty"`        // Error name | e.g., "Resource api/potato not found"
-	Code        string `json:"code,omitempty"`        // Error code | e.g., "ERR_NOT_FOUND"
-	Description string `json:"description,omitempty"` // Error description | e.g., "The requested resource could not be found"
+	ErrorName        string `json:"errorName,omitempty"`        // Error name | e.g., "Resource api/potato not found"
+	ErrorCode        string `json:"errorCode,omitempty"`        // Error code | e.g., "ERR_NOT_FOUND"
+	ErrorDescription string `json:"errorDescription,omitempty"` // Error description | e.g., "The requested resource could not be found"
 
 	// 400s
 
