@@ -20,6 +20,8 @@ func Response1xxInformative(statusCode StatusCode1xx, serverMessage, details, co
 		defaultContent = states.DefaultStatesContent[states.Status102Processing]
 	case Status103:
 		defaultContent = states.DefaultStatesContent[states.Status103Checkpoint]
+	default:
+		return nil
 	}
 
 	res := &interfaces.BaseResponse{
@@ -58,6 +60,8 @@ func Response2xxSuccessfull(statusCode StatusCode2xx, serverMessage, details, co
 		defaultContent = states.DefaultStatesContent[states.Status208AlreadyReported]
 	case Status226:
 		defaultContent = states.DefaultStatesContent[states.Status226IMUsed]
+	default:
+		return nil
 	}
 
 	res := &interfaces.GenericSuccessfullResponse{
@@ -67,18 +71,16 @@ func Response2xxSuccessfull(statusCode StatusCode2xx, serverMessage, details, co
 			Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
 			ConsultedResource: consultedResource,
 		},
-
+		Data: data,
 		SuccessErrorProps: &interfaces.SuccessErrorProps{
 			Success: true,
 			Error:   false,
 		},
 	}
 
-	// for _, opt := range statusOptions {
-	// 	opt(res)
-	// }
-
-	statusOptions(res)
+	if statusOptions != nil {
+		statusOptions(res)
+	}
 
 	return res
 }
@@ -116,14 +118,16 @@ func Response3xxRedirection(statusCode StatusCode3xx, serverMessage, details, co
 		},
 	}
 
-	statusOptions(res)
+	if statusOptions != nil {
+		statusOptions(res)
+	}
 
 	return res
 }
 
 // 400s
 
-func Response4xxClientError(statusCode StatusCode4xx, serverMessage, details, consultedResource string, arbitraryErrors interface{}, statusOptions methods.ResponseErrorOpt) *interfaces.GenericErrorResponse {
+func Response4xxClientError(statusCode StatusCode4xx, serverMessage, consultedResource, errorName, errorCode, errorDescription string, arbitraryErrors interface{}, statusOptions methods.ResponseErrorOpt) *interfaces.GenericErrorResponse {
 	var defaultContent states.HttpStatus
 
 	switch statusCode {
@@ -189,28 +193,35 @@ func Response4xxClientError(statusCode StatusCode4xx, serverMessage, details, co
 
 	res := &interfaces.GenericErrorResponse{
 		BaseResponse: &interfaces.BaseResponse{
-			HttpStatus:        defaultContent.Code,
-			ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-			Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
+			HttpStatus:    defaultContent.Code,
+			ServerMessage: methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
+			// Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
 			ConsultedResource: consultedResource,
 		},
 
 		Errors: arbitraryErrors,
 
+		ErrorDetails: &interfaces.ErrorDetails{
+			ErrorName:        errorName,
+			ErrorCode:        errorCode,
+			ErrorDescription: errorDescription,
+		},
 		SuccessErrorProps: &interfaces.SuccessErrorProps{
 			Success: false,
 			Error:   true,
 		},
 	}
 
-	statusOptions(res)
+	if statusOptions != nil {
+		statusOptions(res)
+	}
 
 	return res
 }
 
 // 500s
 
-func Response5xxServerError(statusCode StatusCode5xx, serverMessage, details, consultedResource string, arbitraryErrors interface{}) *interfaces.GenericErrorResponse {
+func Response5xxServerError(statusCode StatusCode5xx, serverMessage, consultedResource, errorName, errorCode, errorDescription string, arbitraryErrors interface{}) *interfaces.GenericErrorResponse {
 	var defaultContent states.HttpStatus
 
 	switch statusCode {
@@ -244,14 +255,19 @@ func Response5xxServerError(statusCode StatusCode5xx, serverMessage, details, co
 
 	res := &interfaces.GenericErrorResponse{
 		BaseResponse: &interfaces.BaseResponse{
-			HttpStatus:        defaultContent.Code,
-			ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-			Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
+			HttpStatus:    defaultContent.Code,
+			ServerMessage: methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
+			// Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
 			ConsultedResource: consultedResource,
 		},
 
 		Errors: arbitraryErrors,
 
+		ErrorDetails: &interfaces.ErrorDetails{
+			ErrorName:        errorName,
+			ErrorCode:        errorCode,
+			ErrorDescription: errorDescription,
+		},
 		SuccessErrorProps: &interfaces.SuccessErrorProps{
 			Success: false,
 			Error:   true,
