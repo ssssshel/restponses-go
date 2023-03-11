@@ -1,9 +1,9 @@
 package methods
 
-import "github.com/ssssshel/restponses-go/internal/interfaces"
+import interfaces "github.com/ssssshel/restponses-go/internal/interfaces"
 
 type Response2xxOpt func(*interfaces.GenericSuccessfullResponse)
 
 type Response3xxOpt func(*interfaces.GenericRedirectionResponse)
 
-type ResponseErrorOpt func(*interfaces.GenericErrorResponse)
+type Response4xxOpt func(*interfaces.GenericErrorResponse)

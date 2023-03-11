@@ -8,7 +8,7 @@ import (
 
 // 100s
 
-func Response1xxInformative(statusCode StatusCode1xx, serverMessage, details, consultedResource string) *interfaces.BaseResponse {
+func Response1xxInformative(statusCode StatusCode1xx, input *BaseInput) *interfaces.GenericInformativeResponse {
 	var defaultContent states.HttpStatus
 
 	switch statusCode {
@@ -24,11 +24,13 @@ func Response1xxInformative(statusCode StatusCode1xx, serverMessage, details, co
 		return nil
 	}
 
-	res := &interfaces.BaseResponse{
-		HttpStatus:        defaultContent.Code,
-		ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-		Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-		ConsultedResource: consultedResource,
+	res := &interfaces.GenericInformativeResponse{
+		HttpStatus: &defaultContent.Code,
+		BaseResponse: &interfaces.BaseResponse{
+			ServerMessage:     methods.DefaultStringReplacer(input.ServerMessage, defaultContent.Message),
+			Detail:            methods.DefaultStringReplacer(input.Detail, defaultContent.Details),
+			ConsultedResource: input.ConsultedResource,
+		},
 	}
 
 	return res
@@ -36,7 +38,7 @@ func Response1xxInformative(statusCode StatusCode1xx, serverMessage, details, co
 
 // 200s
 
-func Response2xxSuccessfull(statusCode StatusCode2xx, serverMessage, details, consultedResource string, data interface{}, statusOptions methods.Response2xxOpt) *interfaces.GenericSuccessfullResponse {
+func Response2xxSuccessfull(statusCode StatusCode2xx, input *BaseSuccessfulInput) *interfaces.GenericSuccessfullResponse {
 	var defaultContent states.HttpStatus
 
 	switch statusCode {
@@ -65,21 +67,21 @@ func Response2xxSuccessfull(statusCode StatusCode2xx, serverMessage, details, co
 	}
 
 	res := &interfaces.GenericSuccessfullResponse{
+		HttpStatus: &defaultContent.Code,
 		BaseResponse: &interfaces.BaseResponse{
-			HttpStatus:        defaultContent.Code,
-			ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-			Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-			ConsultedResource: consultedResource,
+			ServerMessage:     methods.DefaultStringReplacer(input.ServerMessage, defaultContent.Message),
+			Detail:            methods.DefaultStringReplacer(input.Detail, defaultContent.Details),
+			ConsultedResource: input.ConsultedResource,
 		},
-		Data: data,
+		Data: input.Data,
 		SuccessErrorProps: &interfaces.SuccessErrorProps{
 			Success: true,
 			Error:   false,
 		},
 	}
 
-	if statusOptions != nil {
-		statusOptions(res)
+	if input.StatusOptions != nil {
+		input.StatusOptions(res)
 	}
 
 	return res
@@ -87,7 +89,7 @@ func Response2xxSuccessfull(statusCode StatusCode2xx, serverMessage, details, co
 
 // 300s
 
-func Response3xxRedirection(statusCode StatusCode3xx, serverMessage, details, consultedResource string, statusOptions methods.Response3xxOpt) *interfaces.GenericRedirectionResponse {
+func Response3xxRedirection(statusCode StatusCode3xx, input *BaseRedirectionInput) *interfaces.GenericRedirectionResponse {
 	var defaultContent states.HttpStatus
 
 	switch statusCode {
@@ -110,16 +112,16 @@ func Response3xxRedirection(statusCode StatusCode3xx, serverMessage, details, co
 	}
 
 	res := &interfaces.GenericRedirectionResponse{
+		HttpStatus: &defaultContent.Code,
 		BaseResponse: &interfaces.BaseResponse{
-			HttpStatus:        defaultContent.Code,
-			ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-			Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-			ConsultedResource: consultedResource,
+			ServerMessage:     methods.DefaultStringReplacer(input.ServerMessage, defaultContent.Message),
+			Detail:            methods.DefaultStringReplacer(input.Detail, defaultContent.Details),
+			ConsultedResource: input.Detail,
 		},
 	}
 
-	if statusOptions != nil {
-		statusOptions(res)
+	if input.StatusOptions != nil {
+		input.StatusOptions(res)
 	}
 
 	return res
@@ -127,7 +129,7 @@ func Response3xxRedirection(statusCode StatusCode3xx, serverMessage, details, co
 
 // 400s
 
-func Response4xxClientError(statusCode StatusCode4xx, serverMessage, consultedResource, errorName, errorCode, errorDescription string, arbitraryErrors interface{}, statusOptions methods.ResponseErrorOpt) *interfaces.GenericErrorResponse {
+func Response4xxClientError(statusCode StatusCode4xx, input *BaseClientErrorInput) *interfaces.GenericErrorResponse {
 	var defaultContent states.HttpStatus
 
 	switch statusCode {
@@ -192,28 +194,27 @@ func Response4xxClientError(statusCode StatusCode4xx, serverMessage, consultedRe
 	}
 
 	res := &interfaces.GenericErrorResponse{
+		HttpStatus: &defaultContent.Code,
 		BaseResponse: &interfaces.BaseResponse{
-			HttpStatus:    defaultContent.Code,
-			ServerMessage: methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-			// Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-			ConsultedResource: consultedResource,
+			ServerMessage:     methods.DefaultStringReplacer(input.ServerMessage, defaultContent.Message),
+			Detail:            methods.DefaultStringReplacer(input.Detail, defaultContent.Details),
+			ConsultedResource: input.ConsultedResource,
 		},
 
-		Errors: arbitraryErrors,
+		Errors:           input.Errors,
+		ErrorName:        input.ErrorName,
+		ErrorCode:        input.ErrorCode,
+		ErrorDescription: input.ErrorDescription,
 
-		ErrorDetails: &interfaces.ErrorDetails{
-			ErrorName:        errorName,
-			ErrorCode:        errorCode,
-			ErrorDescription: errorDescription,
-		},
+		ErrorDetails: &interfaces.ErrorDetails{},
 		SuccessErrorProps: &interfaces.SuccessErrorProps{
 			Success: false,
 			Error:   true,
 		},
 	}
 
-	if statusOptions != nil {
-		statusOptions(res)
+	if input.StatusOptions != nil {
+		input.StatusOptions(res)
 	}
 
 	return res
@@ -221,7 +222,7 @@ func Response4xxClientError(statusCode StatusCode4xx, serverMessage, consultedRe
 
 // 500s
 
-func Response5xxServerError(statusCode StatusCode5xx, serverMessage, consultedResource, errorName, errorCode, errorDescription string, arbitraryErrors interface{}) *interfaces.GenericErrorResponse {
+func Response5xxServerError(statusCode StatusCode5xx, input *BaseServerErrorInput) *interfaces.GenericErrorResponse {
 	var defaultContent states.HttpStatus
 
 	switch statusCode {
@@ -254,20 +255,19 @@ func Response5xxServerError(statusCode StatusCode5xx, serverMessage, consultedRe
 	}
 
 	res := &interfaces.GenericErrorResponse{
+		HttpStatus: &defaultContent.Code,
 		BaseResponse: &interfaces.BaseResponse{
-			HttpStatus:    defaultContent.Code,
-			ServerMessage: methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-			// Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-			ConsultedResource: consultedResource,
+			ServerMessage:     methods.DefaultStringReplacer(input.ServerMessage, defaultContent.Message),
+			Detail:            methods.DefaultStringReplacer(input.Detail, defaultContent.Details),
+			ConsultedResource: input.ConsultedResource,
 		},
 
-		Errors: arbitraryErrors,
+		Errors:           input.Errors,
+		ErrorName:        input.ErrorName,
+		ErrorCode:        input.ErrorCode,
+		ErrorDescription: input.ErrorDescription,
 
-		ErrorDetails: &interfaces.ErrorDetails{
-			ErrorName:        errorName,
-			ErrorCode:        errorCode,
-			ErrorDescription: errorDescription,
-		},
+		ErrorDetails: &interfaces.ErrorDetails{},
 		SuccessErrorProps: &interfaces.SuccessErrorProps{
 			Success: false,
 			Error:   true,
