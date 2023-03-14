@@ -8,27 +8,29 @@ import (
 
 // 100s
 
-func Response1xxInformative(statusCode StatusCode1xx, serverMessage, details, consultedResource string) *interfaces.BaseResponse {
+func Response1xxInformative(statusCode StatusCode1xx, input *BaseInput) *interfaces.GenericInformativeResponse {
 	var defaultContent states.HttpStatus
 
 	switch statusCode {
-	case Status100:
+	case Status100Continue:
 		defaultContent = states.DefaultStatesContent[states.Status100Continue]
-	case Status101:
+	case Status101SwitchingProtocols:
 		defaultContent = states.DefaultStatesContent[states.Status101SwitchingProtocols]
-	case Status102:
+	case Status102Processing:
 		defaultContent = states.DefaultStatesContent[states.Status102Processing]
-	case Status103:
+	case Status103EarlyHints:
 		defaultContent = states.DefaultStatesContent[states.Status103Checkpoint]
 	default:
 		return nil
 	}
 
-	res := &interfaces.BaseResponse{
-		HttpStatus:        defaultContent.Code,
-		ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-		Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-		ConsultedResource: consultedResource,
+	res := &interfaces.GenericInformativeResponse{
+		HttpStatus: &defaultContent.Code,
+		BaseResponse: &interfaces.BaseResponse{
+			ServerMessage:     methods.DefaultStringReplacer(input.ServerMessage, defaultContent.Message),
+			Detail:            methods.DefaultStringReplacer(input.Detail, defaultContent.Details),
+			ConsultedResource: input.ConsultedResource,
+		},
 	}
 
 	return res
@@ -36,50 +38,50 @@ func Response1xxInformative(statusCode StatusCode1xx, serverMessage, details, co
 
 // 200s
 
-func Response2xxSuccessfull(statusCode StatusCode2xx, serverMessage, details, consultedResource string, data interface{}, statusOptions methods.Response2xxOpt) *interfaces.GenericSuccessfullResponse {
+func Response2xxSuccessfull(statusCode StatusCode2xx, input *BaseSuccessfulInput) *interfaces.GenericSuccessfullResponse {
 	var defaultContent states.HttpStatus
 
 	switch statusCode {
-	case Status200:
+	case Status200Ok:
 		defaultContent = states.DefaultStatesContent[states.Status200Ok]
-	case Status201:
+	case Status201Continue:
 		defaultContent = states.DefaultStatesContent[states.Status201Created]
-	case Status202:
+	case Status202Accepted:
 		defaultContent = states.DefaultStatesContent[states.Status202Accepted]
-	case Status203:
+	case Status203NonAuthoritativeInfo:
 		defaultContent = states.DefaultStatesContent[states.Status203NonAuthoritativeInformation]
-	case Status204:
+	case Status204NoContent:
 		defaultContent = states.DefaultStatesContent[states.Status204NoContent]
-	case Status205:
+	case Status205ResetContent:
 		defaultContent = states.DefaultStatesContent[states.Status205ResetContent]
-	case Status206:
+	case Status206PartialContent:
 		defaultContent = states.DefaultStatesContent[states.Status206PartialContent]
-	case Status207:
+	case Status207MultiStatus:
 		defaultContent = states.DefaultStatesContent[states.Status207MultiStatus]
-	case Status208:
+	case Status208AlreadyReported:
 		defaultContent = states.DefaultStatesContent[states.Status208AlreadyReported]
-	case Status226:
+	case Status226IMUsed:
 		defaultContent = states.DefaultStatesContent[states.Status226IMUsed]
 	default:
 		return nil
 	}
 
 	res := &interfaces.GenericSuccessfullResponse{
+		HttpStatus: &defaultContent.Code,
 		BaseResponse: &interfaces.BaseResponse{
-			HttpStatus:        defaultContent.Code,
-			ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-			Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-			ConsultedResource: consultedResource,
+			ServerMessage:     methods.DefaultStringReplacer(input.ServerMessage, defaultContent.Message),
+			Detail:            methods.DefaultStringReplacer(input.Detail, defaultContent.Details),
+			ConsultedResource: input.ConsultedResource,
 		},
-		Data: data,
+		Data: input.Data,
 		SuccessErrorProps: &interfaces.SuccessErrorProps{
 			Success: true,
 			Error:   false,
 		},
 	}
 
-	if statusOptions != nil {
-		statusOptions(res)
+	if input.StatusOptions != nil {
+		input.StatusOptions(res)
 	}
 
 	return res
@@ -87,39 +89,39 @@ func Response2xxSuccessfull(statusCode StatusCode2xx, serverMessage, details, co
 
 // 300s
 
-func Response3xxRedirection(statusCode StatusCode3xx, serverMessage, details, consultedResource string, statusOptions methods.Response3xxOpt) *interfaces.GenericRedirectionResponse {
+func Response3xxRedirection(statusCode StatusCode3xx, input *BaseRedirectionInput) *interfaces.GenericRedirectionResponse {
 	var defaultContent states.HttpStatus
 
 	switch statusCode {
-	case Status300:
+	case Status300MultipleChoices:
 		defaultContent = states.DefaultStatesContent[states.Status300MultipleChoices]
-	case Status301:
+	case Status301MovedPermanently:
 		defaultContent = states.DefaultStatesContent[states.Status301MovedPermanently]
-	case Status302:
+	case Status302Found:
 		defaultContent = states.DefaultStatesContent[states.Status302Found]
-	case Status303:
+	case Status303SeeOther:
 		defaultContent = states.DefaultStatesContent[states.Status303SeeOther]
-	case Status304:
+	case Status304NotModified:
 		defaultContent = states.DefaultStatesContent[states.Status304NotModified]
-	case Status305:
+	case Status305UseProxy:
 		defaultContent = states.DefaultStatesContent[states.Status305UseProxy]
-	case Status307:
+	case Status307TemporaryRedirect:
 		defaultContent = states.DefaultStatesContent[states.Status307TemporaryRedirect]
-	case Status308:
+	case Status308PermanentRedirect:
 		defaultContent = states.DefaultStatesContent[states.Status308PermanentRedirect]
 	}
 
 	res := &interfaces.GenericRedirectionResponse{
+		HttpStatus: &defaultContent.Code,
 		BaseResponse: &interfaces.BaseResponse{
-			HttpStatus:        defaultContent.Code,
-			ServerMessage:     methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-			Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-			ConsultedResource: consultedResource,
+			ServerMessage:     methods.DefaultStringReplacer(input.ServerMessage, defaultContent.Message),
+			Detail:            methods.DefaultStringReplacer(input.Detail, defaultContent.Details),
+			ConsultedResource: input.Detail,
 		},
 	}
 
-	if statusOptions != nil {
-		statusOptions(res)
+	if input.StatusOptions != nil {
+		input.StatusOptions(res)
 	}
 
 	return res
@@ -127,93 +129,92 @@ func Response3xxRedirection(statusCode StatusCode3xx, serverMessage, details, co
 
 // 400s
 
-func Response4xxClientError(statusCode StatusCode4xx, serverMessage, consultedResource, errorName, errorCode, errorDescription string, arbitraryErrors interface{}, statusOptions methods.ResponseErrorOpt) *interfaces.GenericErrorResponse {
+func Response4xxClientError(statusCode StatusCode4xx, input *BaseClientErrorInput) *interfaces.GenericErrorResponse {
 	var defaultContent states.HttpStatus
 
 	switch statusCode {
-	case Status400:
+	case Status400BadRequest:
 		defaultContent = states.DefaultStatesContent[states.Status400BadRequest]
-	case Status401:
+	case Status401Unauthorized:
 		defaultContent = states.DefaultStatesContent[states.Status401Unauthorized]
-	case Status402:
+	case Status402PaymentRequired:
 		defaultContent = states.DefaultStatesContent[states.Status402PaymentRequired]
-	case Status403:
+	case Status403Forbidden:
 		defaultContent = states.DefaultStatesContent[states.Status403Forbidden]
-	case Status404:
+	case Status404NotFound:
 		defaultContent = states.DefaultStatesContent[states.Status404NotFound]
-	case Status405:
+	case Status405MethodNotAllowed:
 		defaultContent = states.DefaultStatesContent[states.Status405MethodNotAllowed]
-	case Status406:
+	case Status406NotAcceptable:
 		defaultContent = states.DefaultStatesContent[states.Status406NotAcceptable]
-	case Status407:
+	case Status407ProxyAuthenticationRequired:
 		defaultContent = states.DefaultStatesContent[states.Status407ProxyAuthenticationRequired]
-	case Status408:
+	case Status408RequestTimeout:
 		defaultContent = states.DefaultStatesContent[states.Status408RequestTimeout]
-	case Status409:
+	case Status409Conflict:
 		defaultContent = states.DefaultStatesContent[states.Status409Conflict]
-	case Status410:
+	case Status410Gone:
 		defaultContent = states.DefaultStatesContent[states.Status410Gone]
-	case Status411:
+	case Status411LengthRequired:
 		defaultContent = states.DefaultStatesContent[states.Status411LengthRequired]
-	case Status412:
+	case Status412PreconditionFailed:
 		defaultContent = states.DefaultStatesContent[states.Status412PreconditionFailed]
-	case Status413:
+	case Status413PayloadTooLarge:
 		defaultContent = states.DefaultStatesContent[states.Status413PayloadTooLarge]
-	case Status414:
+	case Status414RequestUriTooLong:
 		defaultContent = states.DefaultStatesContent[states.Status414RequestUriTooLong]
-	case Status415:
+	case Status415UnsupportedMediaType:
 		defaultContent = states.DefaultStatesContent[states.Status415UnsupportedMediaType]
-	case Status416:
+	case Status416RequestRangeNotSatisfiable:
 		defaultContent = states.DefaultStatesContent[states.Status416RequestRangeNotSatisfiable]
-	case Status417:
+	case Status417ExpectationFailed:
 		defaultContent = states.DefaultStatesContent[states.Status417ExpectationFailed]
-	case Status418:
+	case Status418Teapot:
 		defaultContent = states.DefaultStatesContent[states.Status418Teapot]
-	case Status421:
+	case Status421MisdirectedRequest:
 		defaultContent = states.DefaultStatesContent[states.Status421MisdirectedRequest]
-	case Status422:
+	case Status422UnprocessableEntity:
 		defaultContent = states.DefaultStatesContent[states.Status422UnprocessableEntity]
-	case Status423:
+	case Status423Locked:
 		defaultContent = states.DefaultStatesContent[states.Status423Locked]
-	case Status424:
+	case Status424FailedDependency:
 		defaultContent = states.DefaultStatesContent[states.Status424FailedDependency]
-	case Status425:
+	case Status425Unassigned:
 		defaultContent = states.DefaultStatesContent[states.Status425Unassigned]
-	case Status426:
+	case Status426UpgradeRequired:
 		defaultContent = states.DefaultStatesContent[states.Status426UpgradeRequired]
-	case Status428:
+	case Status428PreconditionRequired:
 		defaultContent = states.DefaultStatesContent[states.Status428PreconditionRequired]
-	case Status429:
+	case Status429TooManyRequests:
 		defaultContent = states.DefaultStatesContent[states.Status429TooManyRequests]
-	case Status431:
+	case Status431RequestHeaderFieldsTooLarge:
 		defaultContent = states.DefaultStatesContent[states.Status431RequestHeaderFieldsTooLarge]
-	case Status451:
+	case Status451UnavailableForLegalReasons:
 		defaultContent = states.DefaultStatesContent[states.Status451UnavailableForLegalReasons]
 	}
 
 	res := &interfaces.GenericErrorResponse{
+		HttpStatus: &defaultContent.Code,
 		BaseResponse: &interfaces.BaseResponse{
-			HttpStatus:    defaultContent.Code,
-			ServerMessage: methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-			// Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-			ConsultedResource: consultedResource,
+			ServerMessage:     methods.DefaultStringReplacer(input.ServerMessage, defaultContent.Message),
+			Detail:            methods.DefaultStringReplacer(input.Detail, defaultContent.Details),
+			ConsultedResource: input.ConsultedResource,
 		},
 
-		Errors: arbitraryErrors,
+		Errors:           input.Errors,
+		ErrorName:        input.ErrorName,
+		ErrorCode:        input.ErrorCode,
+		ErrorDescription: input.ErrorDescription,
 
-		ErrorDetails: &interfaces.ErrorDetails{
-			ErrorName:        errorName,
-			ErrorCode:        errorCode,
-			ErrorDescription: errorDescription,
-		},
+		ErrorDetails: &interfaces.ErrorDetails{},
 		SuccessErrorProps: &interfaces.SuccessErrorProps{
 			Success: false,
 			Error:   true,
 		},
 	}
 
-	if statusOptions != nil {
-		statusOptions(res)
+	if input.StatusOptions != nil {
+		input.StatusOptions(res)
 	}
 
 	return res
@@ -221,53 +222,52 @@ func Response4xxClientError(statusCode StatusCode4xx, serverMessage, consultedRe
 
 // 500s
 
-func Response5xxServerError(statusCode StatusCode5xx, serverMessage, consultedResource, errorName, errorCode, errorDescription string, arbitraryErrors interface{}) *interfaces.GenericErrorResponse {
+func Response5xxServerError(statusCode StatusCode5xx, input *BaseServerErrorInput) *interfaces.GenericErrorResponse {
 	var defaultContent states.HttpStatus
 
 	switch statusCode {
-	case Status500:
+	case Status500InternalServerError:
 		defaultContent = states.DefaultStatesContent[states.Status500InternalServerError]
-	case Status501:
+	case Status501NotImplemented:
 		defaultContent = states.DefaultStatesContent[states.Status501NotImplemented]
-	case Status502:
+	case Status502BadGateway:
 		defaultContent = states.DefaultStatesContent[states.Status502BadGateway]
-	case Status503:
+	case Status503ServiceUnavailable:
 		defaultContent = states.DefaultStatesContent[states.Status503ServiceUnavailable]
-	case Status504:
+	case Status504GatewayTimeout:
 		defaultContent = states.DefaultStatesContent[states.Status504GatewayTimeout]
-	case Status505:
+	case Status505HttpVersionNotSupported:
 		defaultContent = states.DefaultStatesContent[states.Status505HTTPVersionNotSupported]
-	case Status506:
+	case Status506VariantAlsoNegotiates:
 		defaultContent = states.DefaultStatesContent[states.Status506VariantAlsoNegotiates]
-	case Status507:
+	case Status507InsufficientStorage:
 		defaultContent = states.DefaultStatesContent[states.Status507InsufficientStorage]
-	case Status508:
+	case Status508LoopDetected:
 		defaultContent = states.DefaultStatesContent[states.Status508LoopDetected]
-	case Status509:
+	case Status509Unassigned:
 		defaultContent = states.DefaultStatesContent[states.Status509BandwidthLimitExceeded]
-	case Status510:
+	case Status510NotExtended:
 		defaultContent = states.DefaultStatesContent[states.Status510NotExtended]
-	case Status511:
+	case Status511NetworkAuthenticationRequired:
 		defaultContent = states.DefaultStatesContent[states.Status511NetworkAuthenticationRequired]
-	case Status521:
+	case Status521WebServerIsDown:
 		defaultContent = states.DefaultStatesContent[states.Status521WebServerIsDown]
 	}
 
 	res := &interfaces.GenericErrorResponse{
+		HttpStatus: &defaultContent.Code,
 		BaseResponse: &interfaces.BaseResponse{
-			HttpStatus:    defaultContent.Code,
-			ServerMessage: methods.DefaultStringReplacer(serverMessage, defaultContent.Message),
-			// Details:           methods.DefaultStringReplacer(details, defaultContent.Details),
-			ConsultedResource: consultedResource,
+			ServerMessage:     methods.DefaultStringReplacer(input.ServerMessage, defaultContent.Message),
+			Detail:            methods.DefaultStringReplacer(input.Detail, defaultContent.Details),
+			ConsultedResource: input.ConsultedResource,
 		},
 
-		Errors: arbitraryErrors,
+		Errors:           input.Errors,
+		ErrorName:        input.ErrorName,
+		ErrorCode:        input.ErrorCode,
+		ErrorDescription: input.ErrorDescription,
 
-		ErrorDetails: &interfaces.ErrorDetails{
-			ErrorName:        errorName,
-			ErrorCode:        errorCode,
-			ErrorDescription: errorDescription,
-		},
+		ErrorDetails: &interfaces.ErrorDetails{},
 		SuccessErrorProps: &interfaces.SuccessErrorProps{
 			Success: false,
 			Error:   true,

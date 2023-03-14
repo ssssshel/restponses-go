@@ -8,26 +8,31 @@ type SuccessErrorProps struct {
 	Error   bool `json:"error,omitempty"`
 }
 
+type BaseResponse struct {
+	ServerMessage     string
+	Detail            string `json:"detail,omitempty"`            // Datailed info of your response
+	ConsultedResource string `json:"consultedResource,omitempty"` // Name/URL of the consulted resource
+}
+
 // 100s
 
-// Base of all responses. Also default response for 1xx state codes
-type BaseResponse struct {
-	HttpStatus        states.StatusCode `json:"status"`
-	ServerMessage     string            `json:"serverMessage"`
-	Details           string            `json:"details,omitempty"`           // Datailed info of your response
-	ConsultedResource string            `json:"consultedResource,omitempty"` // Name/URL of the consulted resource
+type GenericInformativeResponse struct {
+	HttpStatus *states.StatusCode `json:"status"`
+	*BaseResponse
 }
 
 // 200s
 
 type GenericSuccessfullResponse struct {
-	*BaseResponse
-	Data interface{} `json:"data"` // Anything you want to return, don't use for 204 and 205 codes
+	HttpStatus *states.StatusCode `json:"status"`
 
-	Location  string         `json:"location,omitempty"`  // 201 ONLY | URL or place where your creation can be found
-	RequestId string         `json:"requestId,omitempty"` // 202 ONLY | ID with wich you can follow the process of your request
-	Source    *Source        `json:"source,omitempty"`    // 203 ONLY | Here you can put info about the third source involved
-	States    []*BasicStatus `json:"states,omitempty"`    // 207 ONLY | Here you can put info about the multiple states (Status, server_message and resource)
+	*BaseResponse
+	Data interface{} `json:"data,omitempty"` // Anything you want to return, don't use for 204 and 205 codes
+
+	Location  string        `json:"location,omitempty"`  // 201 ONLY | URL or place where your creation can be found
+	RequestId string        `json:"requestId,omitempty"` // 202 ONLY | ID with wich you can follow the process of your request
+	Source    *Source       `json:"source,omitempty"`    // 203 ONLY | Here you can put info about the third source involved
+	States    []*BasicState `json:"states,omitempty"`    // 207 ONLY | Here you can put info about the multiple states (Status, server_message and resource)
 
 	*SuccessErrorProps
 }
@@ -38,15 +43,17 @@ type Source struct {
 	Source      string `json:"source,omitempty"`      // Source url
 }
 
-type BasicStatus struct {
-	HttpStatus    states.StatusCode `json:"status"`
-	ServerMessage string            `json:"serverMessage"`
-	Details       string            `json:"details,omitempty"`
+type BasicState struct {
+	HttpStatus    uint16 `json:"status"`
+	ServerMessage string `json:"serverMessage"`
+	Detail        string `json:"detail,omitempty"`
 }
 
 // 300s
 
 type GenericRedirectionResponse struct {
+	HttpStatus *states.StatusCode `json:"status"`
+
 	*BaseResponse
 
 	Options []interface{} `json:"options,omitempty"` // 300 ONLY | Here you can put the options available for the requested resource
@@ -73,18 +80,21 @@ type Sources struct {
 # Default response for 4xx and 5xx status code.
 */
 type GenericErrorResponse struct {
+	HttpStatus *states.StatusCode `json:"status"`
+
 	*BaseResponse
 	ErrorDetails *ErrorDetails `json:"errorDetails,omitempty"` // Error details
 	Errors       interface{}   `json:"errors,omitempty"`       // List []*ErrorDetail or representation of errors
-	*SuccessErrorProps
-}
-
-type ErrorDetails struct {
 	// GENERIC | Default specs for 4xx and 5xx
 
 	ErrorName        string `json:"errorName,omitempty"`        // Error name | e.g., "Resource api/potato not found"
 	ErrorCode        string `json:"errorCode,omitempty"`        // Error code | e.g., "ERR_NOT_FOUND"
 	ErrorDescription string `json:"errorDescription,omitempty"` // Error description | e.g., "The requested resource could not be found"
+
+	*SuccessErrorProps
+}
+
+type ErrorDetails struct {
 
 	// 400s
 

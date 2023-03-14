@@ -32,7 +32,7 @@ const (
 	Status304 StatusCode = 304
 	Status305 StatusCode = 305
 	Status307 StatusCode = 307
-	Status308 StatusCode = 309
+	Status308 StatusCode = 308
 
 	Status400 StatusCode = 400
 	Status401 StatusCode = 401
