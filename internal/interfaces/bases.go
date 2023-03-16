@@ -9,7 +9,7 @@ type SuccessErrorProps struct {
 }
 
 type BaseResponse struct {
-	ServerMessage     string
+	ServerMessage     string `json:"serverMessage,omitempty"`
 	Detail            string `json:"detail,omitempty"`            // Datailed info of your response
 	ConsultedResource string `json:"consultedResource,omitempty"` // Name/URL of the consulted resource
 }
