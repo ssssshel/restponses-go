@@ -9,7 +9,7 @@ type SuccessErrorProps struct {
 }
 
 type BaseResponse struct {
-	ServerMessage     string
+	ServerMessage     string `json:"serverMessage,omitempty"`
 	Detail            string `json:"detail,omitempty"`            // Datailed info of your response
 	ConsultedResource string `json:"consultedResource,omitempty"` // Name/URL of the consulted resource
 }
@@ -17,14 +17,14 @@ type BaseResponse struct {
 // 100s
 
 type GenericInformativeResponse struct {
-	HttpStatus *states.StatusCode `json:"status"`
+	HttpStatus *states.StatusCode `json:"httpStatus"`
 	*BaseResponse
 }
 
 // 200s
 
 type GenericSuccessfullResponse struct {
-	HttpStatus *states.StatusCode `json:"status"`
+	HttpStatus *states.StatusCode `json:"httpStatus"`
 
 	*BaseResponse
 	Data interface{} `json:"data,omitempty"` // Anything you want to return, don't use for 204 and 205 codes
@@ -44,7 +44,7 @@ type Source struct {
 }
 
 type BasicState struct {
-	HttpStatus    uint16 `json:"status"`
+	HttpStatus    uint16 `json:"httpStatus"`
 	ServerMessage string `json:"serverMessage"`
 	Detail        string `json:"detail,omitempty"`
 }
@@ -52,7 +52,7 @@ type BasicState struct {
 // 300s
 
 type GenericRedirectionResponse struct {
-	HttpStatus *states.StatusCode `json:"status"`
+	HttpStatus *states.StatusCode `json:"httpStatus"`
 
 	*BaseResponse
 
@@ -80,7 +80,7 @@ type Sources struct {
 # Default response for 4xx and 5xx status code.
 */
 type GenericErrorResponse struct {
-	HttpStatus *states.StatusCode `json:"status"`
+	HttpStatus *states.StatusCode `json:"httpStatus"`
 
 	*BaseResponse
 	ErrorDetails *ErrorDetails `json:"errorDetails,omitempty"` // Error details
